@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MotoRent Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563EB; --primary-dark: #1D4ED8;
+            --dark: #1E293B; --sidebar-w: 240px;
+            --gray: #64748B; --light: #F8FAFC;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); display: flex; min-height: 100vh; }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--dark); color: #fff;
+            display: flex; flex-direction: column; position: fixed; height: 100vh;
+            padding: 1.5rem 1rem; z-index: 100;
+        }
+        .sidebar-brand { font-size: 1.2rem; font-weight: 700; color: #fff; padding: 0.5rem 0 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; padding-top: 1rem; }
+        .nav-item {
+            display: flex; align-items: center; padding: 0.6rem 0.8rem;
+            border-radius: 8px; color: rgba(255,255,255,0.7);
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background 0.15s, color 0.15s;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .nav-item.active { background: var(--primary); color: #fff; }
+        .sidebar-footer { padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* ---- MAIN CONTENT ---- */
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .topbar h1 { font-size: 1.5rem; font-weight: 700; }
+        .admin-badge { background: #EFF6FF; color: var(--primary); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+
+        /* ---- STAT CARDS ---- */
+        .stat-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .stat-icon {
+            width: 52px; height: 52px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+        .stat-card .stat-label { font-size: 0.8rem; color: var(--gray); font-weight: 500; margin-top: 2px; }
+
+        /* ---- TABLE ---- */
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .card-header { background: #fff; border-bottom: 1px solid #F1F5F9; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0 !important; }
+        .card-header h5 { font-weight: 700; font-size: 1rem; margin: 0; }
+        .table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray); font-weight: 600; border: none; }
+        .table td { font-size: 0.9rem; vertical-align: middle; border-color: #F1F5F9; }
+        .badge { font-size: 0.75rem; padding: 0.3em 0.7em; border-radius: 20px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bicycle me-2"></i>MotoRent <span class="badge bg-primary ms-1" style="font-size:0.6rem;">Admin</span></div>
+    <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item active"><i class="bi bi-grid-fill me-2"></i> Dashboard</a>
+        <a href="/admin/motorbikes" class="nav-item"><i class="bi bi-bicycle me-2"></i> Motorbikes</a>
+        <a href="/admin/bookings" class="nav-item"><i class="bi bi-calendar-check-fill me-2"></i> Bookings</a>
+        <a href="/admin/customers" class="nav-item"><i class="bi bi-people-fill me-2"></i> Customers</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="nav-item" style="color:#FCA5A5;"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="text-muted mb-0" style="font-size:0.875rem;">Welcome back, overview of your rental system</p>
+        </div>
+        <div class="admin-badge">
+            <i class="bi bi-shield-fill me-1"></i>
+            <span th:text="${userName}">Admin</span>
+        </div>
+    </div>
+
+    <!-- Stat Cards Row 1 -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#EFF6FF; color:#2563EB;"><i class="bi bi-bicycle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${totalMotorbikes}">0</div>
+                    <div class="stat-label">Total Motorbikes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#F0FDF4; color:#16A34A;"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${availableMotorbikes}">0</div>
+                    <div class="stat-label">Available Now</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#FFF7ED; color:#EA580C;"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${totalCustomers}">0</div>
+                    <div class="stat-label">Registered Customers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Cards Row 2 -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#F5F3FF; color:#7C3AED;"><i class="bi bi-calendar-check-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${totalBookings}">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#FFF1F2; color:#E11D48;"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${pendingBookings}">0</div>
+                    <div class="stat-label">Pending Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#F0FDF4; color:#16A34A;"><i class="bi bi-clipboard-check-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${confirmedBookings}">0</div>
+                    <div class="stat-label">Confirmed Bookings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="bi bi-clock-history me-2 text-primary"></i>Recent Bookings</h5>
+            <a href="/admin/bookings" class="btn btn-sm btn-outline-primary" style="border-radius:8px;">View All</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Customer</th>
+                        <th>Motorbike</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="booking : ${recentBookings}">
+                        <td class="ps-4 text-muted" th:text="${booking.id}"></td>
+                        <td th:text="${booking.customer?.fullName}">-</td>
+                        <td th:text="${booking.motorbike?.brandModel}">-</td>
+                        <td th:text="${booking.startDate}">-</td>
+                        <td th:text="${booking.endDate}">-</td>
+                        <td>$<span th:text="${booking.totalPrice}">0</span></td>
+                        <td>
+                                <span th:switch="${booking.status.name()}">
+                                    <span th:case="'PENDING'" class="badge" style="background:#FEF9C3;color:#A16207;">PENDING</span>
+                                    <span th:case="'CONFIRMED'" class="badge" style="background:#DCFCE7;color:#166534;">CONFIRMED</span>
+                                    <span th:case="'CANCELLED'" class="badge" style="background:#FEE2E2;color:#991B1B;">CANCELLED</span>
+                                    <span th:case="'COMPLETED'" class="badge" style="background:#DBEAFE;color:#1E40AF;">COMPLETED</span>
+                                </span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentBookings)}">
+                        <td colspan="7" class="text-center py-4 text-muted">No bookings yet.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

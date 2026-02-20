@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? 'Edit Motorbike | MotoRent Admin' : 'Add Motorbike | MotoRent Admin'">Motorbike Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --primary: #2563EB; --dark: #1E293B; --sidebar-w: 240px; --gray: #64748B; --light: #F8FAFC; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-w); background: var(--dark); color: #fff; display: flex; flex-direction: column; position: fixed; height: 100vh; padding: 1.5rem 1rem; z-index: 100; }
+        .sidebar-brand { font-size: 1.2rem; font-weight: 700; color: #fff; padding: 0.5rem 0 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; padding-top: 1rem; }
+        .nav-item { display: flex; align-items: center; padding: 0.6rem 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: background 0.15s; }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .nav-item.active { background: var(--primary); color: #fff; }
+        .sidebar-footer { padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem; }
+        .form-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 2rem; max-width: 640px; }
+        .form-label { font-size: 0.875rem; font-weight: 600; color: var(--dark); }
+        .form-control, .form-select {
+            border-radius: 8px; border: 1.5px solid #E2E8F0;
+            padding: 0.6rem 0.9rem; font-size: 0.95rem;
+        }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+        .btn-primary { background: var(--primary); border: none; border-radius: 8px; font-weight: 600; padding: 0.6rem 1.5rem; }
+        .btn-secondary { border-radius: 8px; font-weight: 600; padding: 0.6rem 1.5rem; }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bicycle me-2"></i>MotoRent <span class="badge bg-primary ms-1" style="font-size:0.6rem;">Admin</span></div>
+    <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item"><i class="bi bi-grid-fill me-2"></i> Dashboard</a>
+        <a href="/admin/motorbikes" class="nav-item active"><i class="bi bi-bicycle me-2"></i> Motorbikes</a>
+        <a href="/admin/bookings" class="nav-item"><i class="bi bi-calendar-check-fill me-2"></i> Bookings</a>
+        <a href="/admin/customers" class="nav-item"><i class="bi bi-people-fill me-2"></i> Customers</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="nav-item" style="color:#FCA5A5;"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="mb-3">
+        <a href="/admin/motorbikes" class="text-decoration-none text-muted" style="font-size:0.875rem;">
+            <i class="bi bi-arrow-left me-1"></i> Back to Motorbikes
+        </a>
+    </div>
+
+    <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:1.5rem;"
+        th:text="${isEdit} ? 'Edit Motorbike' : 'Add New Motorbike'"></h1>
+
+    <div class="form-card">
+        <form th:action="${isEdit} ? @{/admin/motorbikes/edit/{id}(id=${motorbike.id})} : @{/admin/motorbikes/add}"
+              th:object="${motorbike}" method="post">
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">Brand</label>
+                    <input type="text" class="form-control" th:field="*{brand}" placeholder="Honda" required>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Model</label>
+                    <input type="text" class="form-control" th:field="*{model}" placeholder="Wave 125" required>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">Plate Number</label>
+                    <input type="text" class="form-control" th:field="*{plateNumber}" placeholder="2AA-1234" required>
+                </div>
+                <div class="col-3">
+                    <label class="form-label">Color</label>
+                    <input type="text" class="form-control" th:field="*{color}" placeholder="Red">
+                </div>
+                <div class="col-3">
+                    <label class="form-label">Year</label>
+                    <input type="number" class="form-control" th:field="*{year}" placeholder="2022">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label">Price Per Day ($)</label>
+                    <input type="number" step="0.01" class="form-control" th:field="*{pricePerDay}" placeholder="15.00" required>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" th:field="*{status}">
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Image URL (optional)</label>
+                <input type="text" class="form-control" th:field="*{imageUrl}" placeholder="https://...">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" th:field="*{description}" rows="3"
+                          placeholder="Brief description of the motorbike..."></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>
+                    <span th:text="${isEdit} ? 'Update Motorbike' : 'Add Motorbike'"></span>
+                </button>
+                <a href="/admin/motorbikes" class="btn btn-secondary btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

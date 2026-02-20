@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings | MotoRent Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --primary: #2563EB; --dark: #1E293B; --sidebar-w: 240px; --gray: #64748B; --light: #F8FAFC; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-w); background: var(--dark); color: #fff; display: flex; flex-direction: column; position: fixed; height: 100vh; padding: 1.5rem 1rem; z-index: 100; }
+        .sidebar-brand { font-size: 1.2rem; font-weight: 700; color: #fff; padding: 0.5rem 0 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; padding-top: 1rem; }
+        .nav-item { display: flex; align-items: center; padding: 0.6rem 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .nav-item.active { background: var(--primary); color: #fff; }
+        .sidebar-footer { padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .card-header { background: #fff; border-bottom: 1px solid #F1F5F9; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0 !important; }
+        .table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray); font-weight: 600; border: none; }
+        .table td { font-size: 0.9rem; vertical-align: middle; border-color: #F1F5F9; }
+        .badge { font-size: 0.75rem; padding: 0.3em 0.7em; border-radius: 20px; font-weight: 600; }
+        .status-select { font-size: 0.8rem; border-radius: 6px; padding: 0.25rem 0.5rem; border: 1.5px solid #E2E8F0; }
+        .btn-sm { padding: 0.3rem 0.65rem; font-size: 0.8rem; border-radius: 6px; border: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bicycle me-2"></i>MotoRent <span class="badge bg-primary ms-1" style="font-size:0.6rem;">Admin</span></div>
+    <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item"><i class="bi bi-grid-fill me-2"></i> Dashboard</a>
+        <a href="/admin/motorbikes" class="nav-item"><i class="bi bi-bicycle me-2"></i> Motorbikes</a>
+        <a href="/admin/bookings" class="nav-item active"><i class="bi bi-calendar-check-fill me-2"></i> Bookings</a>
+        <a href="/admin/customers" class="nav-item"><i class="bi bi-people-fill me-2"></i> Customers</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="nav-item" style="color:#FCA5A5;"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div style="margin-bottom:2rem;">
+        <h1 style="font-size:1.5rem; font-weight:700;">Booking Management</h1>
+        <p class="text-muted mb-0" style="font-size:0.875rem;">Review, confirm, or cancel customer bookings</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-calendar-check-fill me-2 text-primary"></i>All Bookings</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Customer</th>
+                        <th>Motorbike</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Days</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="booking : ${bookings}">
+                        <td class="ps-4 text-muted" th:text="${booking.id}"></td>
+                        <td th:text="${booking.customer?.fullName}">-</td>
+                        <td th:text="${booking.motorbike?.brandModel}">-</td>
+                        <td th:text="${booking.startDate}"></td>
+                        <td th:text="${booking.endDate}"></td>
+                        <td th:text="${booking.rentalDays}"></td>
+                        <td>$<span th:text="${booking.totalPrice}"></span></td>
+                        <td>
+                                <span th:switch="${booking.status.name()}">
+                                    <span th:case="'PENDING'" class="badge" style="background:#FEF9C3;color:#A16207;">PENDING</span>
+                                    <span th:case="'CONFIRMED'" class="badge" style="background:#DCFCE7;color:#166534;">CONFIRMED</span>
+                                    <span th:case="'CANCELLED'" class="badge" style="background:#FEE2E2;color:#991B1B;">CANCELLED</span>
+                                    <span th:case="'COMPLETED'" class="badge" style="background:#DBEAFE;color:#1E40AF;">COMPLETED</span>
+                                </span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/bookings/status/{id}(id=${booking.id})}" method="post" class="d-flex gap-1 align-items-center">
+                                <select name="status" class="status-select">
+                                    <option value="PENDING" th:selected="${booking.status.name() == 'PENDING'}">PENDING</option>
+                                    <option value="CONFIRMED" th:selected="${booking.status.name() == 'CONFIRMED'}">CONFIRMED</option>
+                                    <option value="CANCELLED" th:selected="${booking.status.name() == 'CANCELLED'}">CANCELLED</option>
+                                    <option value="COMPLETED" th:selected="${booking.status.name() == 'COMPLETED'}">COMPLETED</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm" style="background:#2563EB;color:#fff;">
+                                    <i class="bi bi-check"></i>
+                                </button>
+                            </form>
+                            <a th:href="@{/admin/bookings/delete/{id}(id=${booking.id})}"
+                               class="btn btn-sm mt-1" style="background:#FEE2E2;color:#991B1B;"
+                               onclick="return confirm('Delete this booking?')">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bookings)}">
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x display-6 d-block mb-2"></i>
+                            No bookings yet.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

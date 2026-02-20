@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | MotoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --primary: #2563EB; --dark: #1E293B; --gray: #64748B; --light: #F8FAFC; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); }
+        .topnav { background: #fff; padding: 0.85rem 2rem; box-shadow: 0 1px 0 #E2E8F0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .brand { font-size: 1.2rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .brand span { color: var(--dark); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--gray); font-weight: 500; font-size: 0.9rem; }
+        .nav-links a.active, .nav-links a:hover { color: var(--primary); }
+        .user-pill { background: #EFF6FF; color: var(--primary); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .section { padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .card-header { background: #fff; border-bottom: 1px solid #F1F5F9; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0 !important; }
+        .table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray); font-weight: 600; border: none; }
+        .table td { font-size: 0.9rem; vertical-align: middle; border-color: #F1F5F9; }
+        .badge { font-size: 0.75rem; padding: 0.3em 0.7em; border-radius: 20px; font-weight: 600; }
+        .btn-cancel { background: #FEE2E2; color: #991B1B; border: none; border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+        .btn-cancel:hover { background: #FECACA; color: #7F1D1D; }
+    </style>
+</head>
+<body>
+<nav class="topnav">
+    <a href="/customer/home" class="brand"><i class="bi bi-bicycle me-1"></i>Moto<span>Rent</span></a>
+    <div class="nav-links">
+        <a href="/customer/home">Home</a>
+        <a href="/customer/browse">Browse</a>
+        <a href="/customer/my-bookings" class="active">My Bookings</a>
+        <div class="user-pill"><i class="bi bi-person-fill me-1"></i><span th:text="${userName}">User</span></div>
+        <a href="/logout" style="color:#E11D48;font-weight:600;"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
+    </div>
+</nav>
+
+<div class="section">
+    <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:0.25rem;">My Bookings</h1>
+    <p class="text-muted mb-4" style="font-size:0.875rem;">Track and manage your rental history</p>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-calendar-check-fill me-2 text-primary"></i>Booking History</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Motorbike</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Days</th>
+                        <th>Total</th>
+                        <th>Booked On</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="booking : ${bookings}">
+                        <td class="ps-4 text-muted" th:text="${booking.id}"></td>
+                        <td>
+                            <div class="fw-semibold" th:text="${booking.motorbike?.brandModel}">-</div>
+                            <div class="text-muted" style="font-size:0.78rem;" th:text="${booking.motorbike?.plateNumber}">-</div>
+                        </td>
+                        <td th:text="${booking.startDate}"></td>
+                        <td th:text="${booking.endDate}"></td>
+                        <td th:text="${booking.rentalDays}"></td>
+                        <td class="fw-semibold" style="color:#2563EB;">$<span th:text="${booking.totalPrice}"></span></td>
+                        <td th:text="${booking.createdAt}"></td>
+                        <td>
+                                <span th:switch="${booking.status.name()}">
+                                    <span th:case="'PENDING'" class="badge" style="background:#FEF9C3;color:#A16207;">PENDING</span>
+                                    <span th:case="'CONFIRMED'" class="badge" style="background:#DCFCE7;color:#166534;">CONFIRMED</span>
+                                    <span th:case="'CANCELLED'" class="badge" style="background:#FEE2E2;color:#991B1B;">CANCELLED</span>
+                                    <span th:case="'COMPLETED'" class="badge" style="background:#DBEAFE;color:#1E40AF;">COMPLETED</span>
+                                </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/customer/bookings/cancel/{id}(id=${booking.id})}"
+                               th:if="${booking.status.name() == 'PENDING'}"
+                               class="btn-cancel"
+                               onclick="return confirm('Cancel this booking?')">
+                                <i class="bi bi-x-circle me-1"></i>Cancel
+                            </a>
+                            <span th:unless="${booking.status.name() == 'PENDING'}" class="text-muted" style="font-size:0.8rem;">—</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bookings)}">
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x display-5 d-block mb-3 opacity-50"></i>
+                            You have no bookings yet.
+                            <a href="/customer/browse" class="d-block mt-2" style="color:#2563EB;">Browse motorbikes</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
