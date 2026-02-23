@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotoRent — Ride Anywhere, Anytime</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --dark: #1E293B;
+            --gray: #64748B;
+            --light: #F8FAFC;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; color: var(--dark); }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            box-shadow: 0 1px 0 #E2E8F0;
+        }
+        .navbar-brand {
+            font-size: 1.4rem; font-weight: 800;
+            color: var(--primary); text-decoration: none; letter-spacing: -0.5px;
+        }
+        .navbar-brand span { color: var(--dark); }
+        .navbar-links { display: flex; align-items: center; gap: 1.5rem; }
+        .navbar-links a {
+            text-decoration: none; color: var(--gray);
+            font-weight: 500; font-size: 0.9rem; transition: color 0.15s;
+        }
+        .navbar-links a:hover { color: var(--primary); }
+        .btn-login {
+            border: 2px solid var(--primary); color: var(--primary);
+            padding: 0.4rem 1.1rem; border-radius: 8px;
+            font-weight: 600; font-size: 0.9rem; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-login:hover { background: var(--primary); color: #fff; }
+        .btn-signup {
+            background: var(--primary); color: #fff;
+            padding: 0.4rem 1.1rem; border-radius: 8px;
+            font-weight: 600; font-size: 0.9rem; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-signup:hover { background: var(--primary-dark); color: #fff; }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 72vh;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #2563EB 100%);
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; color: #fff;
+            padding: 7rem 2rem 4rem;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute;
+            width: 600px; height: 600px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%; top: -150px; right: -150px;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 680px; }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.9);
+            padding: 0.4rem 1rem; border-radius: 20px;
+            font-size: 0.82rem; font-weight: 600; margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .hero h1 {
+            font-size: 3.2rem; font-weight: 800;
+            line-height: 1.1; margin-bottom: 1.25rem; letter-spacing: -1px;
+        }
+        .hero h1 span { color: #93C5FD; }
+        .hero p {
+            font-size: 1.1rem; color: rgba(255,255,255,0.75);
+            max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7;
+        }
+        .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-hero-primary {
+            background: #fff; color: var(--primary);
+            padding: 0.75rem 2rem; border-radius: 10px; font-weight: 700;
+            font-size: 1rem; text-decoration: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); color: var(--primary); }
+        .btn-hero-outline {
+            background: rgba(255,255,255,0.15); color: #fff;
+            padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;
+            font-size: 1rem; text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: background 0.2s;
+        }
+        .btn-hero-outline:hover { background: rgba(255,255,255,0.25); color: #fff; }
+
+        /* ===== STATS ===== */
+        .stats-bar {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 2rem;
+            display: flex; justify-content: center; gap: 4rem;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.82rem; color: var(--gray); font-weight: 500; margin-top: 2px; }
+
+        /* ===== BIKES SECTION ===== */
+        .bikes-section {
+            padding: 4rem 2rem;
+            background: var(--light);
+        }
+        .section-tag {
+            color: var(--primary); font-size: 0.8rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;
+        }
+        .section-title { font-size: 1.9rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .section-sub { color: var(--gray); font-size: 0.95rem; margin-bottom: 2.5rem; }
+
+        /* Bike cards */
+        .bike-card {
+            background: #fff; border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .bike-card:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(37,99,235,0.13); }
+        .bike-img {
+            height: 190px;
+            background: linear-gradient(135deg, #DBEAFE, #EFF6FF);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .bike-img img { width: 100%; height: 100%; object-fit: cover; }
+        .bike-img i { font-size: 4rem; color: var(--primary); opacity: 0.6; }
+        .bike-body { padding: 1.25rem; }
+        .bike-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .bike-title { font-weight: 700; font-size: 1rem; color: var(--dark); }
+        .badge-avail {
+            background: #DCFCE7; color: #166534;
+            font-size: 0.7rem; padding: 0.22em 0.6em;
+            border-radius: 20px; font-weight: 700; white-space: nowrap;
+        }
+        .bike-meta { font-size: 0.82rem; color: var(--gray); margin-bottom: 0.5rem; }
+        .bike-price { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 0.85rem; }
+        .bike-price span { font-size: 0.8rem; font-weight: 400; color: var(--gray); }
+        .btn-book-login {
+            display: block; text-align: center;
+            background: var(--primary); color: #fff;
+            padding: 0.55rem 1rem; border-radius: 8px;
+            font-weight: 600; font-size: 0.875rem;
+            text-decoration: none; transition: background 0.15s;
+        }
+        .btn-book-login:hover { background: var(--primary-dark); color: #fff; }
+
+        /* ===== HOW IT WORKS ===== */
+        .how { padding: 4rem 2rem; background: #fff; }
+        .step-circle {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #EFF6FF; color: var(--primary);
+            font-weight: 800; font-size: 1.15rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .step-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; }
+        .step-desc { color: var(--gray); font-size: 0.875rem; line-height: 1.6; }
+
+        /* ===== CTA ===== */
+        .cta {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary-dark) 100%);
+            color: #fff; padding: 5rem 2rem; text-align: center;
+        }
+        .cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; }
+        .cta p { color: rgba(255,255,255,0.75); margin-bottom: 2rem; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--dark); color: rgba(255,255,255,0.45);
+            text-align: center; padding: 1.25rem; font-size: 0.82rem;
+        }
+        .footer span { color: rgba(255,255,255,0.8); font-weight: 600; }
+
+        /* ===== LOGIN PROMPT OVERLAY on card ===== */
+        .login-prompt {
+            display: block; text-align: center;
+            background: #EFF6FF; color: var(--primary);
+            padding: 0.55rem 1rem; border-radius: 8px;
+            font-weight: 600; font-size: 0.875rem;
+            text-decoration: none; transition: background 0.15s;
+            border: 1.5px solid #BFDBFE;
+        }
+        .login-prompt:hover { background: #DBEAFE; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand"><i class="bi bi-bicycle me-1"></i>Moto<span>Rent</span></a>
+    <div class="navbar-links">
+        <a href="#bikes">Browse Bikes</a>
+        <a href="#how">How It Works</a>
+        <a href="/login" class="btn-login">Log In</a>
+        <a href="/register" class="btn-signup">Get Started</a>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge"><i class="bi bi-star-fill me-1"></i> #1 Motorbike Rental in Cambodia</div>
+        <h1>Ride <span>Anywhere</span>,<br>Anytime You Want</h1>
+        <p>Affordable motorbike rentals for every journey. Browse hundreds of bikes and book in minutes.</p>
+        <div class="hero-buttons">
+            <a href="/register" class="btn-hero-primary">
+                <i class="bi bi-person-plus-fill me-2"></i>Start Renting Free
+            </a>
+            <a href="/login" class="btn-hero-outline">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STATS BAR ===== -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="stat-value">500+</div>
+        <div class="stat-label">Motorbikes Available</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">2K+</div>
+        <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">$5</div>
+        <div class="stat-label">Starting Per Day</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">24/7</div>
+        <div class="stat-label">Support Available</div>
+    </div>
+</div>
+
+<!-- ===== AVAILABLE BIKES ===== -->
+<section class="bikes-section" id="bikes">
+    <div style="max-width:1200px; margin:0 auto;">
+        <div class="section-tag">Our Fleet</div>
+        <h2 class="section-title">Available Motorbikes</h2>
+        <p class="section-sub">Browse our latest bikes — sign in to book your ride instantly.</p>
+
+        <!-- Bikes Grid -->
+        <div class="row g-3" th:if="${!#lists.isEmpty(motorbikes)}">
+            <div class="col-md-4 col-lg-3" th:each="bike : ${motorbikes}">
+                <div class="bike-card">
+                    <div class="bike-img">
+                        <img th:if="${bike.imageUrl != null and !bike.imageUrl.isEmpty()}"
+                             th:src="${bike.imageUrl}" alt="bike">
+                        <i th:unless="${bike.imageUrl != null and !bike.imageUrl.isEmpty()}"
+                           class="bi bi-bicycle"></i>
+                    </div>
+                    <div class="bike-body">
+                        <div class="bike-header">
+                            <div class="bike-title" th:text="${bike.brandModel}"></div>
+                            <span class="badge-avail">Available</span>
+                        </div>
+                        <div class="bike-meta" th:text="${bike.year} + ' · ' + ${bike.color} + ' · ' + ${bike.plateNumber}"></div>
+                        <div class="bike-price">$<span th:text="${bike.pricePerDay}"></span> <span>/day</span></div>
+                        <!-- Book Now → redirects to login -->
+                        <a href="/login" class="login-prompt">
+                            <i class="bi bi-calendar-plus me-1"></i> Book Now — Sign In First
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(motorbikes)}" class="text-center py-5 text-muted">
+            <i class="bi bi-bicycle display-4 d-block mb-3 opacity-40"></i>
+            <p>No motorbikes available right now. Check back soon!</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how" id="how">
+    <div style="max-width:900px; margin:0 auto; text-align:center;">
+        <div class="section-tag">Simple Process</div>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-sub" style="margin:0 auto 3rem;">Get on the road in just 3 easy steps.</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-circle">1</div>
+                <div class="step-title">Create an Account</div>
+                <div class="step-desc">Sign up for free in seconds. Just your name, email, and password.</div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-circle">2</div>
+                <div class="step-title">Browse & Pick a Bike</div>
+                <div class="step-desc">Explore our fleet, compare prices, choose the right bike for you.</div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-circle">3</div>
+                <div class="step-title">Book & Ride</div>
+                <div class="step-desc">Pick your dates, confirm the booking, and you're ready to go!</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta">
+    <h2>Ready to Hit the Road?</h2>
+    <p>Join thousands of riders who trust MotoRent for their daily adventures.</p>
+    <a href="/register" class="btn-hero-primary">
+        <i class="bi bi-person-plus-fill me-2"></i>Create Free Account
+    </a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    © 2026 <span>MotoRent</span> — OOP Final Project | Paragon International University
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

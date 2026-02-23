@@ -5,6 +5,7 @@ import kh.edu.paragoniu.mrs.entity.Admin;
 import kh.edu.paragoniu.mrs.entity.Customer;
 import kh.edu.paragoniu.mrs.service.AdminService;
 import kh.edu.paragoniu.mrs.service.CustomerService;
+import kh.edu.paragoniu.mrs.service.MotorbikeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +17,26 @@ public class AuthController {
 
     private final CustomerService customerService;
     private final AdminService adminService;
+    private final MotorbikeService motorbikeService;
 
-    public AuthController(CustomerService customerService, AdminService adminService) {
+    public AuthController(CustomerService customerService,
+                          AdminService adminService,
+                          MotorbikeService motorbikeService) {
         this.customerService = customerService;
         this.adminService = adminService;
+        this.motorbikeService = motorbikeService;
     }
 
-    // ---- Root redirect ----
+    // ---- Landing Page ----
     @GetMapping("/")
-    public String root(HttpSession session) {
+    public String landing(HttpSession session, Model model) {
         String role = (String) session.getAttribute("role");
         if ("ADMIN".equals(role)) return "redirect:/admin/dashboard";
         if ("CUSTOMER".equals(role)) return "redirect:/customer/home";
-        return "redirect:/login";
+
+        // Pass available motorbikes to show on landing page
+        model.addAttribute("motorbikes", motorbikeService.getAvailableMotorbikes());
+        return "landing";
     }
 
     // ---- Login ----
@@ -90,6 +98,6 @@ public class AuthController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/";
     }
 }
